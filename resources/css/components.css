@@ -616,3 +616,32 @@
     .vc-hero--video .vc-hero__poster { transition: none; }
   }
 }
+
+/* ============================================================================
+   Brand lockup
+
+   The supplied logo is pure white ink with alpha. It reads correctly on the dark
+   surfaces and is INVISIBLE on the light theme's paper, so a dark-ink variant is
+   derived at build time and the pair is swapped by theme. Both are in the markup and
+   toggled with CSS rather than swapped by script, so the correct one is present at
+   first paint and there is no flash of the wrong mark.
+   ========================================================================= */
+
+@layer components {
+  .vc-brand__logo { display: block; height: 1.75rem; width: auto; }
+
+  /* Dark is the default theme. */
+  .vc-brand__logo--ink { display: none; }
+
+  :root[data-theme="light"] .vc-brand__logo--light { display: none; }
+  :root[data-theme="light"] .vc-brand__logo--ink   { display: block; }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]):not([data-theme="light"]) .vc-brand__logo--light { display: none; }
+    :root:not([data-theme="dark"]):not([data-theme="light"]) .vc-brand__logo--ink   { display: block; }
+  }
+
+  /* The footer sits on a dark surface in BOTH themes, so it always takes the white mark. */
+  .vc-foot .vc-brand__logo--light { display: block; }
+  .vc-foot .vc-brand__logo--ink   { display: none; }
+}

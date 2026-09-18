@@ -32,6 +32,8 @@
 @if ($desc)<meta name="description" content="{{ $desc }}">@endif
 <meta name="robots" content="{{ $robots }}">
 <link rel="canonical" href="{{ $canonical }}">
+<link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+<link rel="apple-touch-icon" href="{{ asset('images/logo-square.png') }}">
 <meta name="google-site-verification" content="{{ config('site.google_site_verification') }}">
 
 <meta property="og:type" content="website">

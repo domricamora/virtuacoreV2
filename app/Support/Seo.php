@@ -37,6 +37,13 @@ final class Seo
             '@id'       => url('/#organization'),
             'name'      => config('site.name'),
             'url'       => url('/'),
+            'logo'      => [
+                '@type'  => 'ImageObject',
+                'url'    => asset('images/logo-square.png'),
+                'width'  => 512,
+                'height' => 512,
+            ],
+            'image'     => asset('images/logo-square.png'),
             'email'     => config('site.email'),
             'telephone' => $phone['e164'],
             'description' => 'VirtuaCore places vetted remote staff with businesses: sales '

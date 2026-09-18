@@ -19,9 +19,7 @@
   <div class="vc-nav__bar" data-nav-bar>
     <div class="vc-wrap vc-wrap--wide" style="display:flex;align-items:center;gap:1.5rem;width:100%;">
 
-      <a class="vc-brand" href="{{ route('home') }}">
-        <span>{{ config('site.name') }}</span>
-      </a>
+      <x-brand />
 
       <nav class="vc-nav__links" aria-label="Primary">
         <div class="vc-drop">

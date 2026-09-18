@@ -13,9 +13,7 @@
     <div class="vc-foot__grid">
 
       <div>
-        <a class="vc-brand" href="{{ route('home') }}">
-          <span>{{ config('site.name') }}</span>
-        </a>
+        <x-brand />
         <p style="margin-top:1rem;max-width:32ch;line-height:1.6;color:var(--text-muted);font-size:0.93rem;">
           Vetted remote staff for growing businesses. Scoped in writing, replaced if wrong.
         </p>

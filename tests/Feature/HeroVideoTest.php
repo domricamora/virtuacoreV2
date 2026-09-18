@@ -60,28 +60,46 @@ final class HeroVideoTest extends TestCase
         }
     }
 
-    public function test_one_clip_is_reused_rather_than_one_per_page(): void
+    public function test_each_page_uses_the_clip_assigned_to_it(): void
     {
-        // Reusing the encoded clip means the second page costs nothing from cache; a
-        // per-page clip would cost another 1.9 MB each time. Assert the set of distinct
-        // files across every page is exactly the two encodes that exist.
-        $files = [];
+        // Footage is per page now, chosen to match what the page is about. A page showing
+        // the wrong clip is not a crash -- it just quietly misrepresents the section, so
+        // the mapping is asserted rather than trusted.
+        $expected = [
+            'home'         => 'hero',
+            'services'     => 'services',
+            'how-it-works' => 'how-it-works',
+            'pricing'      => 'how-it-works',   // a pricing conversation IS a planning one
+            'about'        => 'about',
+            'contact'      => 'contact',
+            'for-authors'  => 'hero',           // PLACEHOLDER: needs writing footage
+        ];
 
+        foreach ($expected as $route => $clip) {
+            $html = $this->get(route($route))->assertOk()->getContent();
+
+            preg_match_all('~data-src="[^"]*/([a-z0-9-]+)-(?:720|1080)\.mp4"~', $html, $m);
+            $used = array_values(array_unique($m[1]));
+
+            $this->assertSame([$clip], $used, "{$route} should use the '{$clip}' clip");
+        }
+    }
+
+    public function test_every_referenced_clip_and_poster_actually_exists(): void
+    {
+        // A missing file renders a <video> that silently never plays, leaving the poster
+        // up forever -- which looks exactly like the loading gate working correctly.
         foreach (self::marketingPages() as [$name]) {
             $html = $this->get(route($name))->assertOk()->getContent();
-            preg_match_all('~data-src="[^"]*/(hero-[^"/]+\.mp4)"~', $html, $m);
 
-            $this->assertNotEmpty($m[1], "{$name} references no hero video file");
-            $files = array_merge($files, $m[1]);
+            preg_match_all('~(?:data-src|poster)="[^"]*/([^"/]+\.(?:mp4|webp))"~', $html, $m);
+            $this->assertNotEmpty($m[1], "{$name} references no hero media");
+
+            foreach (array_unique($m[1]) as $file) {
+                $dir  = str_ends_with($file, '.mp4') ? 'video' : 'images';
+                $path = public_path($dir.'/'.$file);
+                $this->assertFileExists($path, "{$name} references missing media: {$file}");
+            }
         }
-
-        $distinct = array_values(array_unique($files));
-        sort($distinct);
-
-        $this->assertSame(
-            ['hero-1080.mp4', 'hero-720.mp4'],
-            $distinct,
-            'more than one clip is in use: '.implode(', ', $distinct)
-        );
     }
 }

@@ -19,7 +19,7 @@
 <main id="main">
 
   <section class="vc-hero--compact">
-    <x-hero-video compact />
+    <x-hero-video compact clip="about" />
 
     <div class="vc-wrap vc-wrap--wide">
       <nav class="vc-breadcrumb" aria-label="Breadcrumb">

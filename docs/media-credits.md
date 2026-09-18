@@ -3,37 +3,55 @@
 Every third-party asset that ships in this repo, with its source and licence.
 **Add an entry here before committing any new media.**
 
-## Hero video
+## Hero videos
 
-| | |
-|---|---|
-| Title | People Working On Their Laptops In An Office |
-| Author | cottonbro studio |
-| Source | https://www.pexels.com/video/people-working-on-their-laptops-in-an-office-3202364/ |
-| File ID | `3202364` (direct: `videos.pexels.com/video-files/3202364/3202364-hd_1920_1080_25fps.mp4`) |
-| Licence | Pexels License — free for commercial use, no attribution required, modification permitted. Redistribution of the unmodified file as stock is not. |
-| Retrieved | 2026-09-18 |
+One clip per page, chosen to match what the page is about. All from Pexels under the
+Pexels License: free for commercial use, modification permitted, **no attribution
+required**. Recorded here so provenance is auditable, not because the pages must display it.
 
-Attribution is **not required** by the licence. It is recorded here so the provenance of
-the file is auditable, not because the page must display it.
+| Page | Clip | Pexels ID | Author |
+|---|---|---|---|
+| Home | People Working On Their Laptops In An Office | [3202364](https://www.pexels.com/video/people-working-on-their-laptops-in-an-office-3202364/) | cottonbro studio |
+| Services (+ detail) | People In A Conference Room For A Business Meeting | [3205624](https://www.pexels.com/video/people-in-a-conference-room-for-a-business-meeting-3205624/) | — |
+| How it works | Men Planning Together While Using Whiteboard | [9365375](https://www.pexels.com/video/men-planning-together-while-using-whiteboard-9365375/) | — |
+| Pricing | *(reuses the how-it-works clip)* | 9365375 | — |
+| About | Office Team Having A Meeting | [8033854](https://www.pexels.com/video/office-team-having-a-meeting-8033854/) | — |
+| Contact | Team Meeting | [7147921](https://www.pexels.com/video/team-meeting-7147921/) | — |
+| For authors (+ detail) | **PLACEHOLDER — reuses the home clip** | 3202364 | cottonbro studio |
 
-### Delivered variants
+Retrieved 2026-09-18.
 
-Source was 1920x1080, 25fps, 15.16s, 5.3 MB, single continuous shot (no scene cuts, which
-is what makes it usable as a loop).
+### Outstanding: the author pages need their own footage
 
-| File | Purpose | Size |
-|---|---|---|
-| `public/video/hero-1080.mp4` | primary, H.264 CRF 28, faststart, silent | 1.9 MB |
-| `public/video/hero-720.mp4` | small screens, H.264 CRF 30, silent | 715 KB |
-| `public/images/hero-poster.webp` | LCP image and reduced-motion fallback | 46 KB |
-| `public/images/hero-poster.jpg` | fallback for the fallback | 82 KB |
+`/for-authors/` and its six detail pages currently show the general laptop clip. They
+should show writing, manuscripts or books — the author line is a different audience from
+the staffing line, and that is the whole argument of the page.
 
-Audio is stripped (`-an`) — the track is silent by construction, not merely muted, so a
-browser that ignores `muted` still cannot make noise.
+No writing clip could be sourced automatically: Pexels' download pages sit behind a
+Cloudflare challenge, and the CDN filenames are not derivable from the video ID. The
+general clip is used as the least-wrong stand-in, because a conference room behind author
+copy would actively misrepresent who the page is for.
 
-The loop cut is a hard cut, not a crossfade. Behind the hero's dark overlay, at the scale
-the video plays, it is not perceptible; a crossfade would cost bitrate for no visible gain.
+**To fix:** download a 1080p writing/manuscript clip from Pexels, drop it in
+`resources/source-media/video/`, and it can be encoded and wired in one step.
+
+### Encoding
+
+Every clip: trimmed to 15s maximum, audio stripped with `-an` (silent by construction, so
+a browser ignoring `muted` still cannot make noise), H.264 CRF 28 at 1080p and CRF 30 at
+720p, `-movflags +faststart`, plus a WebP poster from a representative frame.
+
+| File | 1080p | 720p | Poster |
+|---|---|---|---|
+| `hero-*` | 1.9 MB | 715 KB | 46 KB |
+| `services-*` | 2.4 MB | 958 KB | 133 KB |
+| `how-it-works-*` | 1.8 MB | 716 KB | 47 KB |
+| `about-*` | 1.2 MB | 494 KB | 100 KB |
+| `contact-*` | 2.5 MB | 1.2 MB | 89 KB |
+
+Per-page clips mean a visitor moving between pages downloads each one rather than reusing
+a cached file. That is the cost of relevance, and it is why the loading gate matters more
+now, not less: reduced-motion, Save-Data, 2g and low-memory sessions still fetch nothing.
 
 ## Brand assets
 

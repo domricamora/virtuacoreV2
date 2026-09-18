@@ -21,6 +21,18 @@ return [
 
     'email' => 'info@virtuacore.net',
 
+    /**
+     * Where enquiry notifications go. Both addresses are on the site's own domain, so
+     * delivery is local and does not depend on an external SMTP provider.
+     *
+     * The lead is written to storage/logs/leads.log BEFORE any send is attempted, so a
+     * mail failure degrades to "nobody was notified" rather than "the enquiry is gone".
+     */
+    'lead_recipients' => [
+        'admin@virtuacore.net',
+        'info@virtuacore.net',
+    ],
+
     'address' => [
         'street'   => '30 N Gould St Ste N',
         'locality' => 'Sheridan',

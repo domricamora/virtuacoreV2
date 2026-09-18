@@ -14,7 +14,8 @@
     :crumbs="[
         ['name' => 'Home',  'url' => route('home')],
         ['name' => 'About', 'url' => $canonical],
-    ]">
+    ]"
+    :og-image="asset('images/about-poster.webp')">
 
 <main id="main">
 

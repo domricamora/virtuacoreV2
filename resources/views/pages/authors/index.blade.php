@@ -36,7 +36,8 @@
             'numberOfItems'   => count($authors),
             'itemListElement' => $listItems,
         ],
-    ]]">
+    ]]"
+    :og-image="asset('images/authors-poster.webp')">
 
 <main id="main">
 

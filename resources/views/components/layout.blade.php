@@ -15,9 +15,12 @@
     $full      = $title ? (str_contains($title, $brand) ? $title : "{$title} | {$brand}") : $brand;
     $canonical = url()->current();
     $desc      = $description ? Seo::meta($description) : null;
-    $og        = $ogImage ?: asset('images/hero-poster.jpg');
+    // Each page has its own hero poster, so each page gets its own share image. One
+    // shared image makes every link preview look identical, which is a wasted signal.
+    $og = $ogImage ?: asset('images/hero-poster.jpg');
 
     $graph = Seo::graph(array_merge(
+        [Seo::webPage($canonical, $full, $description)],
         (array) $schema,
         [Seo::breadcrumbs((array) $crumbs)]
     ));
@@ -37,12 +40,16 @@
 <meta name="google-site-verification" content="{{ config('site.google_site_verification') }}">
 
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="{{ $brand }}">
 <meta property="og:title" content="{{ $full }}">
 @if ($desc)<meta property="og:description" content="{{ $desc }}">@endif
 <meta property="og:url" content="{{ $canonical }}">
 <meta property="og:image" content="{{ $og }}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $full }}">
+@if ($desc)<meta name="twitter:description" content="{{ $desc }}">@endif
+<meta name="twitter:image" content="{{ $og }}">
 
 {{-- Set the theme before first paint. Without this the page flashes the wrong theme.
      The .js class is also what lets the reveal animation hide content safely: the hidden

@@ -127,6 +127,8 @@ final class SeoController extends Controller
 
         $lines[] = '';
         $lines[] = 'Sitemap: '.route('sitemap');
+        // Named here so a crawler that does not already look for /llms.txt still finds it.
+        $lines[] = '# Plain-text brief for AI assistants: '.route('llms');
         $lines[] = '';
 
         return response(implode("\n", $lines), 200, ['Content-Type' => 'text/plain; charset=utf-8']);

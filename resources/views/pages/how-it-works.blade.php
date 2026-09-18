@@ -36,7 +36,8 @@
         ['name' => 'Home',         'url' => route('home')],
         ['name' => 'How it works', 'url' => $canonical],
     ]"
-    :schema="[$howTo, Seo::faqPage($faqPairs, $canonical)]">
+    :schema="[$howTo, Seo::faqPage($faqPairs, $canonical)]"
+    :og-image="asset('images/how-it-works-poster.webp')">
 
 <main id="main">
 

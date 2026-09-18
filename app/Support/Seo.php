@@ -77,6 +77,28 @@ final class Seo
         ];
     }
 
+    /**
+     * A WebPage node for the page being rendered.
+     *
+     * Without it the graph describes the ORGANISATION but never the page itself, so a
+     * crawler has no entity to attach the page's title, description or breadcrumb to.
+     * It is the node that makes the rest of the graph resolve to something.
+     */
+    public static function webPage(string $canonical, string $name, ?string $description = null): array
+    {
+        return array_filter([
+            '@type'       => 'WebPage',
+            '@id'         => $canonical.'#webpage',
+            'url'         => $canonical,
+            'name'        => $name,
+            'description' => $description ? self::meta($description) : null,
+            'isPartOf'    => ['@id' => url('/#website')],
+            'about'       => ['@id' => url('/#organization')],
+            'publisher'   => ['@id' => url('/#organization')],
+            'inLanguage'  => 'en-US',
+        ]);
+    }
+
     /** @param array<string, mixed> $svc */
     public static function service(array $svc, string $canonical): array
     {

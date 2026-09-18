@@ -35,7 +35,8 @@
             'numberOfItems'   => count($services),
             'itemListElement' => $listItems,
         ],
-    ]]">
+    ]]"
+    :og-image="asset('images/services-poster.webp')">
 
 <main id="main">
 

@@ -21,7 +21,8 @@
         'url'           => $canonical,
         'isPartOf'      => ['@id' => url('/#website')],
         'mainEntity'    => ['@id' => url('/#organization')],
-    ]]">
+    ]]"
+    :og-image="asset('images/contact-poster.webp')">
 
 <main id="main">
 

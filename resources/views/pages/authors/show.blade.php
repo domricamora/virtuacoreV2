@@ -15,7 +15,8 @@
     :schema="[
         Seo::service($svc, route('authors.show', $slug)),
         Seo::faqPage($svc['faqs'], route('authors.show', $slug)),
-    ]">
+    ]"
+    :og-image="asset('images/authors-poster.webp')">
 
 <main id="main">
 

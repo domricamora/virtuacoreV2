@@ -20,7 +20,8 @@
         ['name' => 'Home',    'url' => route('home')],
         ['name' => 'Pricing', 'url' => $canonical],
     ]"
-    :schema="[Seo::faqPage($faqs, $canonical)]">
+    :schema="[Seo::faqPage($faqs, $canonical)]"
+    :og-image="asset('images/pricing-poster.webp')">
 
 <main id="main">
 

@@ -40,9 +40,10 @@
 
 <main id="main">
 
-  <section class="vc-section" style="position:relative;">
-    <div class="vc-hero__aura" aria-hidden="true" style="opacity:0.5;"></div>
-    <div class="vc-wrap vc-wrap--wide" style="position:relative;">
+  <section class="vc-hero--compact">
+    <x-hero-video compact />
+
+    <div class="vc-wrap vc-wrap--wide">
       <nav class="vc-breadcrumb" aria-label="Breadcrumb">
         <a href="{{ route('home') }}">Home</a>
         <x-icon name="caret-right" />

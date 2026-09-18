@@ -30,25 +30,7 @@
        reads worst, because the measure runs to the viewport width. --}}
   <section class="vc-hero vc-hero--video">
 
-    {{-- The poster paints immediately and is the LCP image. The video mounts over it only
-         when the hero is near the viewport AND the session qualifies: reduced motion,
-         Save-Data, 2g or low memory all stop here, having fetched none of the 1.9 MB.
-         Sources stay in data-src until that gate passes, which is what makes
-         preload="none" actually mean none. --}}
-    <div class="vc-hero__video">
-      <video data-hero-video
-             muted loop playsinline preload="none"
-             poster="{{ asset('images/hero-poster.webp') }}"
-             aria-hidden="true" tabindex="-1">
-        <source data-src="{{ asset('video/hero-720.mp4') }}"  type="video/mp4" media="(max-width: 1023px)">
-        <source data-src="{{ asset('video/hero-1080.mp4') }}" type="video/mp4">
-      </video>
-    </div>
-
-    <div class="vc-hero__poster" aria-hidden="true"
-         style="--hero-poster-src:url('{{ asset('images/hero-poster.webp') }}');"></div>
-
-    <div class="vc-hero__scrim" aria-hidden="true"></div>
+    <x-hero-video />
 
     <div class="vc-wrap vc-wrap--wide">
       <div class="vc-hero__grid">
@@ -72,18 +54,6 @@
       </div>
     </div>
 
-    {{-- WCAG 2.2.2. Hidden by script only when the video will never play, because then
-         there is nothing to pause. --}}
-    <button type="button" class="vc-hero__toggle" data-hero-toggle
-            data-state="paused" aria-pressed="true" aria-label="Play background video">
-      <svg class="vc-hero__pause" viewBox="0 0 16 16" aria-hidden="true">
-        <rect x="3" y="2" width="4" height="12" rx="1"></rect>
-        <rect x="9" y="2" width="4" height="12" rx="1"></rect>
-      </svg>
-      <svg class="vc-hero__play" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M4 2.5v11a.5.5 0 0 0 .76.43l9-5.5a.5.5 0 0 0 0-.86l-9-5.5A.5.5 0 0 0 4 2.5Z"></path>
-      </svg>
-    </button>
 
   </section>
 

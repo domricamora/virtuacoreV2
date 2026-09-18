@@ -1,0 +1,107 @@
+name: Deploy
+
+# Deploys on a push to main. The FTP account is chrooted to the web root, so the app
+# source cannot live above it -- it goes in a sibling directory that .htaccess denies.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # Two deploys writing the same FTP tree at once corrupts the sync state file and the
+  # next run then re-uploads everything or, worse, skips changed files.
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          # Matches the server (8.3.33). Building on a different minor than production
+          # runs is how a platform-specific failure reaches the live site first.
+          php-version: '8.3'
+          extensions: mbstring, openssl, pdo, tokenizer, xml, ctype, fileinfo, curl, zip
+          coverage: none
+
+      - name: Install PHP dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Build assets
+        run: |
+          npm ci
+          npm run build
+
+      # Tests run against dev dependencies, so they need a second install. Running them
+      # AFTER the production build means the thing being tested is the thing shipping.
+      - name: Run tests
+        run: |
+          composer install --prefer-dist --no-interaction
+          cp .env.example .env
+          php artisan key:generate
+          php artisan test
+
+      - name: Re-install production dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Cache routes and views
+        # NOT config:cache. That would bake CI's environment values into the shipped
+        # cache file, and the production .env would then be ignored entirely.
+        run: |
+          php artisan route:cache
+          php artisan view:cache
+
+      - name: Deploy application source
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          # The host's certificate is issued for its own hostname, not ftp.virtuacore.net,
+          # so strict verification fails. The channel is still encrypted; plain FTP would
+          # send the password in cleartext and is never an acceptable fallback.
+          security: loose
+          server-dir: ${{ secrets.FTP_APP_DIR }}
+          local-dir: ./
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            **/.env
+            **/.env.*
+            **/storage/logs/**
+            **/storage/framework/cache/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/**
+            **/docs/**
+            **/public/**
+            **/.github/**
+            **/resources/source-media/**
+
+      - name: Deploy public web root
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
+          server-dir: ${{ secrets.FTP_PUBLIC_DIR }}
+          local-dir: ./public/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/robots.txt.laravel-default

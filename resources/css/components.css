@@ -508,13 +508,16 @@
   .vc-hero--video { position: relative; isolation: isolate; }
 
   .vc-hero--video .vc-hero__video,
-  .vc-hero--video .vc-hero__poster {
+  .vc-hero--video .vc-hero__poster,
+  .vc-hero--compact .vc-hero__video,
+  .vc-hero--compact .vc-hero__poster {
     position: absolute;
     inset: 0;
     z-index: 0;
   }
 
-  .vc-hero--video .vc-hero__video video {
+  .vc-hero--video .vc-hero__video video,
+  .vc-hero--compact .vc-hero__video video {
     display: block;
     width: 100%;
     height: 100%;
@@ -522,13 +525,16 @@
     opacity: 0;
     transition: opacity 1.1s ease;
   }
-  .vc-hero--video .vc-hero__video video[data-playing="true"] { opacity: 1; }
+  .vc-hero--video .vc-hero__video video[data-playing="true"],
+  .vc-hero--compact .vc-hero__video video[data-playing="true"] { opacity: 1; }
 
-  .vc-hero--video .vc-hero__poster {
+  .vc-hero--video .vc-hero__poster,
+  .vc-hero--compact .vc-hero__poster {
     background: center / cover no-repeat var(--hero-poster-src);
     transition: opacity 1.1s ease;
   }
-  .vc-hero--video:has(video[data-playing="true"]) .vc-hero__poster { opacity: 0; }
+  .vc-hero--video:has(video[data-playing="true"]) .vc-hero__poster,
+  .vc-hero--compact:has(video[data-playing="true"]) .vc-hero__poster { opacity: 0; }
 
   /* Scrim. Two gradients, not one: the horizontal pass buys contrast for the copy on the
      left while letting the footage stay visible on the right, and the vertical pass keeps
@@ -538,7 +544,8 @@
      #fdf9f6 over the copy column reaches 12.6:1, and the deck colour 7.9:1 — both well
      past AA. If the clip is ever swapped, RE-MEASURE. A scrim tuned for one video is not
      valid for another, and the failure is silent. */
-  .vc-hero--video .vc-hero__scrim {
+  .vc-hero--video .vc-hero__scrim,
+  .vc-hero--compact .vc-hero__scrim {
     position: absolute;
     inset: 0;
     z-index: 1;
@@ -559,7 +566,8 @@
   /* On phones the copy sits over the middle of the frame rather than beside it, so the
      horizontal gradient no longer does the work and the scrim goes flat and heavier. */
   @media (max-width: 767px) {
-    .vc-hero--video .vc-hero__scrim {
+    .vc-hero--video .vc-hero__scrim,
+    .vc-hero--compact .vc-hero__scrim {
       background: linear-gradient(180deg,
         rgb(16 8 8 / 0.82) 0%,
         rgb(16 8 8 / 0.70) 45%,
@@ -613,7 +621,9 @@
 
   @media (prefers-reduced-motion: reduce) {
     .vc-hero--video .vc-hero__video video,
-    .vc-hero--video .vc-hero__poster { transition: none; }
+    .vc-hero--video .vc-hero__poster,
+    .vc-hero--compact .vc-hero__video video,
+    .vc-hero--compact .vc-hero__poster { transition: none; }
   }
 }
 
@@ -644,4 +654,45 @@
   /* The footer sits on a dark surface in BOTH themes, so it always takes the white mark. */
   .vc-foot .vc-brand__logo--light { display: block; }
   .vc-foot .vc-brand__logo--ink   { display: none; }
+}
+
+/* ============================================================================
+   Compact video hero — inner pages
+
+   The homepage hero is a full-height panel. An inner page has content to get to, so its
+   hero is sized to the copy instead. Same clip, same gate, same scrim contract.
+   ========================================================================= */
+
+@layer components {
+  .vc-hero--compact {
+    position: relative;
+    isolation: isolate;
+    min-height: 0;
+    display: block;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2.5rem, 5vw, 4rem);
+    overflow: clip;
+  }
+
+  /* Breadcrumb and headings sit over footage here too, so they take the light treatment
+     in BOTH themes — a light-theme page must not inherit dark-on-paper text in the hero. */
+  .vc-hero--compact .vc-wrap { position: relative; z-index: 2; }
+  .vc-hero--compact .vc-display,
+  .vc-hero--compact .vc-h1 { color: #fdf9f6; }
+  .vc-hero--compact .vc-deck { color: #e6dcd6; }
+  .vc-hero--compact .vc-eyebrow { color: var(--color-gold-300); }
+  .vc-hero--compact .vc-breadcrumb,
+  .vc-hero--compact .vc-breadcrumb a,
+  .vc-hero--compact .vc-breadcrumb span { color: #d9ccc6; }
+  .vc-hero--compact .vc-breadcrumb a:hover { color: #fdf9f6; }
+
+  /* The icon badge sits on footage rather than a surface, so it needs its own ground. */
+  .vc-hero--compact .vc-icon-badge {
+    background: rgb(16 8 8 / 0.55);
+    border-color: rgb(255 255 255 / 0.18);
+    color: #fdf9f6;
+    backdrop-filter: blur(6px);
+  }
+
+  /* The answer block is deliberately NOT in the hero on inner pages: it is long-form and
+     belongs on a readable surface, not over video. */
 }

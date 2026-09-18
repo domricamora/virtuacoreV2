@@ -86,6 +86,12 @@ final class Content
         return self::get('company');
     }
 
+    /** @return array{outcomes: array, pillars: array, cta_points: array} */
+    public static function home(): array
+    {
+        return self::get('home');
+    }
+
     /** @return array<string, mixed>|null */
     public static function service(string $slug): ?array
     {

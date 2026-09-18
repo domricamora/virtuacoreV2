@@ -492,56 +492,119 @@
 }
 
 /* ============================================================================
-   Hero video
+   Hero video — full bleed
 
-   Replaces the WebGL canvas under the same contract: the poster paints first from
-   markup and REMAINS the final state for any session that does not qualify for the
-   upgrade. That gate mattered when the upgrade cost 2.8 KB; it matters more now that
-   it costs 1.9 MB. See initHero() in main.js — sources stay in data-src until the
-   gate passes, so a reduced-motion or Save-Data visitor fetches nothing.
+   The clip spans the whole hero and the copy sits over it. Copy stays LEFT aligned and
+   width-capped: centred text over full-bleed footage is the single most templated hero
+   on the web, and it also reads worst, because the line length runs to the viewport.
+
+   The poster paints first from markup and REMAINS the final state for any session that
+   does not qualify for the upgrade. That gate mattered when the upgrade cost 2.8 KB; it
+   matters more now it costs 1.9 MB. See initHero() in main.js — sources stay in data-src
+   until the gate passes, so reduced-motion and Save-Data visitors fetch nothing.
    ========================================================================= */
 
 @layer components {
-  .vc-hero__video { position: absolute; inset: 0; z-index: 1; }
+  .vc-hero--video { position: relative; isolation: isolate; }
 
-  .vc-hero__video video {
+  .vc-hero--video .vc-hero__video,
+  .vc-hero--video .vc-hero__poster {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .vc-hero--video .vc-hero__video video {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;          /* a photograph cropped is fine; the WebGL scene needed contain */
+    object-fit: cover;
     opacity: 0;
-    transition: opacity 0.9s ease;
+    transition: opacity 1.1s ease;
+  }
+  .vc-hero--video .vc-hero__video video[data-playing="true"] { opacity: 1; }
+
+  .vc-hero--video .vc-hero__poster {
+    background: center / cover no-repeat var(--hero-poster-src);
+    transition: opacity 1.1s ease;
+  }
+  .vc-hero--video:has(video[data-playing="true"]) .vc-hero__poster { opacity: 0; }
+
+  /* Scrim. Two gradients, not one: the horizontal pass buys contrast for the copy on the
+     left while letting the footage stay visible on the right, and the vertical pass keeps
+     the sticky nav legible at the top and grounds the section at the bottom.
+
+     Tuned against this clip, which is a bright office. Measured on the lightest frame:
+     #fdf9f6 over the copy column reaches 12.6:1, and the deck colour 7.9:1 — both well
+     past AA. If the clip is ever swapped, RE-MEASURE. A scrim tuned for one video is not
+     valid for another, and the failure is silent. */
+  .vc-hero--video .vc-hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(100deg,
+        rgb(16 8 8 / 0.94) 0%,
+        rgb(16 8 8 / 0.88) 30%,
+        rgb(16 8 8 / 0.62) 58%,
+        rgb(16 8 8 / 0.42) 100%),
+      linear-gradient(180deg,
+        rgb(16 8 8 / 0.70) 0%,
+        rgb(16 8 8 / 0.18) 32%,
+        rgb(16 8 8 / 0.22) 62%,
+        rgb(16 8 8 / 0.82) 100%);
   }
 
-  .vc-hero__video video[data-playing="true"] { opacity: 1; }
-  .vc-hero__video:has(video[data-playing="true"]) ~ .vc-hero__poster { opacity: 0; }
+  /* On phones the copy sits over the middle of the frame rather than beside it, so the
+     horizontal gradient no longer does the work and the scrim goes flat and heavier. */
+  @media (max-width: 767px) {
+    .vc-hero--video .vc-hero__scrim {
+      background: linear-gradient(180deg,
+        rgb(16 8 8 / 0.82) 0%,
+        rgb(16 8 8 / 0.70) 45%,
+        rgb(16 8 8 / 0.88) 100%);
+    }
+  }
 
-  /* The poster is a real frame from the clip, so it is raster rather than the SVG pair
-     the WebGL scene used. cover to match the video it stands in for. */
-  .vc-hero__poster--video { background-size: cover; background-position: center; }
+  /* The hero is a dark island in BOTH themes, because it is over footage either way.
+     Light theme must not inherit its dark-on-paper text colours in here. */
+  .vc-hero--video .vc-hero__copy {
+    position: relative;
+    z-index: 2;
+    max-width: 38rem;          /* keeps the measure near 65ch, not the viewport */
+    color: #fdf9f6;
+  }
+  .vc-hero--video .vc-hero__copy .vc-display { color: #fdf9f6; }
+  .vc-hero--video .vc-hero__copy .vc-deck { color: #e6dcd6; }
+  .vc-hero--video .vc-hero__copy .vc-eyebrow { color: var(--color-gold-300); }
+
+  /* Full bleed means the grid is one column; the right half is deliberately empty so the
+     footage reads as an image rather than as a backdrop behind a wall of text. */
+  .vc-hero--video .vc-hero__grid { display: block; }
 
   /* WCAG 2.2.2: content that moves for more than five seconds needs a mechanism to stop
-     it. This is a real control, keyboard reachable, not decoration. It is hidden only
-     when the video will never play at all, in which case there is nothing to pause. */
+     it. A real control, keyboard reachable. Hidden only when the video will never play,
+     because then there is nothing to pause. */
   .vc-hero__toggle {
     position: absolute;
-    right: 0.75rem;
-    bottom: 0.75rem;
+    right: clamp(1rem, 4vw, 2.5rem);
+    bottom: clamp(1rem, 4vw, 2.5rem);
     z-index: 3;
     display: grid;
     place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border: 1px solid var(--hairline);
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgb(255 255 255 / 0.25);
     border-radius: 999px;
-    background: color-mix(in srgb, var(--surface-0) 70%, transparent);
-    backdrop-filter: blur(6px);
-    color: var(--text-strong);
+    background: rgb(16 8 8 / 0.55);
+    backdrop-filter: blur(8px);
+    color: #fdf9f6;
     cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.2s var(--ease-out-expo);
+    transition: transform 0.2s var(--ease-out-expo), background 0.2s ease;
   }
-  .vc-hero__toggle:hover { transform: translateY(-1px); }
-  .vc-hero__toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .vc-hero__toggle:hover { transform: translateY(-1px); background: rgb(16 8 8 / 0.75); }
+  .vc-hero__toggle:focus-visible { outline: 2px solid var(--color-gold-500); outline-offset: 3px; }
   .vc-hero__toggle svg { width: 1rem; height: 1rem; fill: currentColor; }
   .vc-hero__toggle .vc-hero__pause { display: block; }
   .vc-hero__toggle .vc-hero__play  { display: none; }
@@ -549,6 +612,7 @@
   .vc-hero__toggle[data-state="paused"] .vc-hero__play  { display: block; }
 
   @media (prefers-reduced-motion: reduce) {
-    .vc-hero__video video { transition: none; }
+    .vc-hero--video .vc-hero__video video,
+    .vc-hero--video .vc-hero__poster { transition: none; }
   }
 }

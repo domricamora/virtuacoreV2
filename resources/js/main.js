@@ -201,7 +201,14 @@ function initForms() {
         const res = await fetch(form.action, {
           method: 'POST',
           body: new FormData(form),
-          headers: { 'X-Requested-With': 'fetch' },
+          // Accept MUST be set, and X-Requested-With MUST be XMLHttpRequest: Laravel's
+          // expectsJson() recognises those two and nothing else. Sending 'fetch' made the
+          // server answer with a 302 to an HTML page, res.json() threw on it, and the
+          // catch below reported it as a connection failure.
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
         });
         const data = await res.json();
 

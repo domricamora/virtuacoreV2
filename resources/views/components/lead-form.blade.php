@@ -18,7 +18,8 @@
 @endphp
 
 <form class="vc-card" style="padding:clamp(1.5rem,3vw,2.25rem);display:grid;gap:1.1rem;"
-      method="post" action="{{ route('lead.store') }}" data-lead-form id="{{ $fid }}">
+      method="post" action="{{ route('lead.store') }}" data-lead-form id="{{ $fid }}"
+      data-thanks="Thank you. We will reply within one business day.">
   @csrf
   <input type="hidden" name="intent" value="{{ $intent }}">
   <input type="hidden" name="page" value="{{ request()->path() }}">

@@ -66,15 +66,12 @@ jobs:
       # it. public/ contents go to the root and the app to a sibling directory, which means
       # index.php's "one level up" assumption is wrong on the server. Rewritten here rather
       # than in the repo, so local development and `artisan serve` keep working normally.
-      - name: Point index.php at the deployed app directory
+      # Rewrites bootstrap paths AND sets the public path. Kept in a script rather than
+      # inline, because the nested quoting this needs is unreadable in YAML and broke once.
+      - name: Prepare index.php for the split layout
         run: |
-          php -r '
-            $f = "public/index.php";
-            $s = file_get_contents($f);
-            $s = str_replace("__DIR__.'/../", "__DIR__.'/vc_app/", $s);
-            file_put_contents($f, $s);
-          '
-          grep -n "vc_app" public/index.php
+          php tools/prepare-production-index.php
+          grep -n "vc_app\|usePublicPath" public/index.php
 
       - name: Deploy application source
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -100,6 +97,7 @@ jobs:
             **/storage/framework/cache/**
             **/storage/framework/sessions/**
             **/storage/framework/views/**
+            **/bootstrap/cache/*.php
             **/docs/**
             **/public/**
             **/.github/**

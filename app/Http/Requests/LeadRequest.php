@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Support\Content;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 final class LeadRequest extends FormRequest
 {
@@ -45,5 +47,30 @@ final class LeadRequest extends FormRequest
             'email.email'    => 'That does not look like an email address — please check it.',
             'vc_hp.prohibited' => 'That submission looked automated.',
         ];
+    }
+
+    /**
+     * Answer validation failures in the shape the form actually renders.
+     *
+     * Laravel's default is {message, errors:{field:[...]}}, but the client shows one
+     * message against one field and needs {field, error}. Returning the default meant a
+     * rejected submission showed nothing at all next to the offending input.
+     */
+    protected function failedValidation(Validator $validator): void
+    {
+        if (! $this->expectsJson()) {
+            parent::failedValidation($validator);
+
+            return;
+        }
+
+        $errors = $validator->errors();
+        $field  = $errors->keys()[0] ?? null;
+
+        throw new HttpResponseException(response()->json([
+            'ok'    => false,
+            'field' => $field,
+            'error' => $field ? $errors->first($field) : 'Please check the form and try again.',
+        ], 422));
     }
 }

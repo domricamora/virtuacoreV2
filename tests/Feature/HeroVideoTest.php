@@ -69,10 +69,10 @@ final class HeroVideoTest extends TestCase
             'home'         => 'hero',
             'services'     => 'services',
             'how-it-works' => 'how-it-works',
-            'pricing'      => 'how-it-works',   // a pricing conversation IS a planning one
+            'pricing'      => 'pricing',
             'about'        => 'about',
             'contact'      => 'contact',
-            'for-authors'  => 'hero',           // PLACEHOLDER: needs writing footage
+            'for-authors'  => 'authors',
         ];
 
         foreach ($expected as $route => $clip) {

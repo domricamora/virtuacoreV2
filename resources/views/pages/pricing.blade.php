@@ -25,7 +25,7 @@
 <main id="main">
 
   <section class="vc-hero--compact">
-    <x-hero-video compact clip="how-it-works" />
+    <x-hero-video compact clip="pricing" />
 
     <div class="vc-wrap vc-wrap--wide">
       <nav class="vc-breadcrumb" aria-label="Breadcrumb">

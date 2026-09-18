@@ -667,10 +667,25 @@
   .vc-hero--compact {
     position: relative;
     isolation: isolate;
-    min-height: 0;
-    display: block;
-    padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2.5rem, 5vw, 4rem);
+    /* Full height, matching the homepage. dvh not vh: vh is wrong by the height of the
+       iOS address bar and the hero then jumps as the bar hides on scroll. */
+    min-height: min(100dvh, 900px);
+    display: grid;
+    align-items: center;
+    padding-block: clamp(3rem, 6vw, 5.5rem) clamp(3rem, 8vw, 5rem);
     overflow: clip;
+  }
+
+  /* Below the desktop breakpoint a full-height hero stops paying for itself: on a
+     390x844 phone the stacked copy is already taller than the viewport, and centring
+     it pushes the first line up behind the sticky nav where it cannot be scrolled to.
+     Flow from the start instead. */
+  @media (max-width: 1023px) {
+    .vc-hero--compact {
+      min-height: 0;
+      align-items: start;
+      padding-block: 2.5rem 3rem;
+    }
   }
 
   /* Breadcrumb and headings sit over footage here too, so they take the light treatment

@@ -25,3 +25,9 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Vendored third-party skill packages (see skills-lock.json for what is installed).
+# Not committed: unrelated to this project, and this repo is public.
+/.agents/
+/.claude/
+/skills/

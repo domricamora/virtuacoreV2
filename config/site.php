@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Every owner-editable global lives here. Views never hardcode these.
+ *
+ * The WordPress site displayed +1-307-333-8809 but linked tel:+1-800-456-478-23, an
+ * Elementor theme placeholder that is not a valid E.164 number and cannot be dialled.
+ * Keeping the display string and the link as two views of ONE value is what stops that
+ * class of bug returning.
+ */
+return [
+    'name'    => 'VirtuaCore',
+    'tagline' => 'Virtual Support, Real Results',
+
+    'phone' => [
+        'display' => '+1-307-333-8809',
+        'e164'    => '+13073338809',
+    ],
+
+    'email' => 'info@virtuacore.net',
+
+    'address' => [
+        'street'   => '30 N Gould St Ste N',
+        'locality' => 'Sheridan',
+        'region'   => 'WY',
+        'postal'   => '82801',
+        'country'  => 'US',
+    ],
+
+    // TODO(owner): confirm the time zone. The old site said "Mon - Sat: 8.00 - 18.00"
+    // without one, which is ambiguous for a remote-staffing company selling coverage.
+    'hours' => ['days' => 'Mon – Sat', 'open' => '08:00', 'close' => '18:00', 'tz' => null],
+
+    // Only URLs that actually resolve belong here. The WordPress footer pointed every
+    // social icon at "#", which is worse than omitting them.
+    'social' => [
+        'facebook'  => 'https://www.facebook.com/virtuacoreVA/',
+        'instagram' => 'https://www.instagram.com/virtuacore_llc/',
+        'linkedin'  => null,   // TODO(owner)
+        'x'         => null,   // TODO(owner)
+    ],
+
+    'google_site_verification' => 'ttmbkDUsHXydqb42AtnapaihDHQ1Imb7Oc3TB6_0bw0',
+
+    /**
+     * Nothing on this site claims something that is not true.
+     *
+     * The WordPress build rendered every counter as a literal 0 (Support Given: 0,
+     * Clients Rating: 0+, Awards Won: 0) and carried five testimonials that read as
+     * placeholder names over stock headshots. A zeroed counter says "no clients"; an
+     * invented review is a lie a prospect can check. Turn a flag on only when there is
+     * real, attributable data to put behind it.
+     */
+    'features' => [
+        'stats'        => false,  // needs real figures
+        'testimonials' => false,  // names+quotes are real, photos are not; initials avatars pending
+        'logo_wall'    => false,  // the six SVGs on the old site are Elementor demo logos
+    ],
+];

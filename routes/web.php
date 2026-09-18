@@ -18,13 +18,13 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'home')->name('home');
 
 Route::view('/services', 'pages.services.index')->name('services');
-Route::view('/how-it-works', 'pages.stub', ['heading' => 'How it works'])->name('how-it-works');
-Route::view('/pricing', 'pages.stub', ['heading' => 'Pricing'])->name('pricing');
+Route::view('/how-it-works', 'pages.how-it-works')->name('how-it-works');
+Route::view('/pricing', 'pages.pricing')->name('pricing');
 Route::view('/for-authors', 'pages.authors.index')->name('for-authors');
-Route::view('/about', 'pages.stub', ['heading' => 'About'])->name('about');
-Route::view('/contact', 'pages.stub', ['heading' => 'Contact'])->name('contact');
-Route::view('/privacy-policy', 'pages.stub', ['heading' => 'Privacy policy'])->name('privacy');
-Route::view('/terms', 'pages.stub', ['heading' => 'Terms'])->name('terms');
+Route::view('/about', 'pages.about')->name('about');
+Route::view('/contact', 'pages.contact')->name('contact');
+Route::view('/privacy-policy', 'pages.privacy')->name('privacy');
+Route::view('/terms', 'pages.terms')->name('terms');
 
 /**
  * Detail pages are driven entirely by the content layer: one array entry creates the page.

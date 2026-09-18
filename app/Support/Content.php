@@ -68,6 +68,24 @@ final class Content
         return self::get('objections');
     }
 
+    /** @return array<int, array<string, mixed>> */
+    public static function weekOne(): array
+    {
+        return self::get('week-one');
+    }
+
+    /** @return array{models: array, drivers: array, faqs: array} */
+    public static function pricing(): array
+    {
+        return self::get('pricing');
+    }
+
+    /** @return array{story: array, mission: array, vision: array, departments: array} */
+    public static function company(): array
+    {
+        return self::get('company');
+    }
+
     /** @return array<string, mixed>|null */
     public static function service(string $slug): ?array
     {

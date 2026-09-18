@@ -65,9 +65,23 @@ return [
      * invented review is a lie a prospect can check. Turn a flag on only when there is
      * real, attributable data to put behind it.
      */
+    /**
+     * Legal pages state a date. It is a config value rather than the view file's mtime so
+     * that a deploy touching the template does not silently claim the policy changed.
+     * Update it when the POLICY changes.
+     */
+    'legal' => [
+        'updated'    => '2026-09-18',
+        'legal_name' => 'VirtuaCore LLC',
+    ],
+
     'features' => [
         'stats'        => false,  // needs real figures
         'testimonials' => false,  // names+quotes are real, photos are not; initials avatars pending
-        'logo_wall'    => false,  // the six SVGs on the old site are Elementor demo logos
+        'logo_wall'    => false,
+        // Own-server analytics. OFF until the tracking layer is ported: the privacy policy
+        // is written from this flag, and a policy describing collection that does not
+        // happen is as wrong as one that omits collection that does.
+        'analytics'    => false,  // the six SVGs on the old site are Elementor demo logos
     ],
 ];

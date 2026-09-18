@@ -16,7 +16,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(ROOT, 'node_modules', '@phosphor-icons', 'core', 'assets');
-const OUT = join(ROOT, 'assets', 'img', 'icons.svg');
+// public/, not resources/: the sprite is referenced by <use href> at runtime rather
+// than imported, so Vite must not fingerprint it out from under the markup.
+const OUT = join(ROOT, 'public', 'images', 'icons.svg');
 
 /** [phosphorSlug, weight] - weight defaults to 'regular'. */
 const ICONS = [
@@ -76,4 +78,4 @@ writeFileSync(
 );
 
 const kb = (Buffer.byteLength(readFileSync(OUT)) / 1024).toFixed(1);
-console.log(`build-icons: ${symbols.length} icons -> assets/img/icons.svg (${kb} KB)`);
+console.log(`build-icons: ${symbols.length} icons -> public/images/icons.svg (${kb} KB)`);

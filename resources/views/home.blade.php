@@ -7,6 +7,8 @@
 <link rel="preload" as="image" href="{{ asset('images/hero-poster.webp') }}" type="image/webp" fetchpriority="high">
 @endpush
 
+<x-site.nav />
+
 <main id="main">
 
   {{-- Full-bleed video hero. Copy stays LEFT aligned and width-capped over the footage:

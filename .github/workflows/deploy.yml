@@ -62,6 +62,20 @@ jobs:
           php artisan route:cache
           php artisan view:cache
 
+      # The FTP account is chrooted to the web root, so the app source cannot live above
+      # it. public/ contents go to the root and the app to a sibling directory, which means
+      # index.php's "one level up" assumption is wrong on the server. Rewritten here rather
+      # than in the repo, so local development and `artisan serve` keep working normally.
+      - name: Point index.php at the deployed app directory
+        run: |
+          php -r '
+            $f = "public/index.php";
+            $s = file_get_contents($f);
+            $s = str_replace("__DIR__.'/../", "__DIR__.'/vc_app/", $s);
+            file_put_contents($f, $s);
+          '
+          grep -n "vc_app" public/index.php
+
       - name: Deploy application source
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

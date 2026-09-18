@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Mail\LeadAcknowledged;
 use App\Mail\LeadReceived;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -86,5 +87,52 @@ final class LeadMailTest extends TestCase
             ->assertSessionHasErrors('vc_hp');
 
         Mail::assertNothingSent();
+    }
+
+    public function test_the_enquirer_gets_an_acknowledgement(): void
+    {
+        // Without it the only confirmation is a line on a page they are about to leave.
+        Mail::fake();
+        $this->post(route('lead.store'), $this->payload());
+
+        Mail::assertSent(LeadAcknowledged::class, fn ($m) => $m->hasTo('dana@example.com'));
+    }
+
+    public function test_the_acknowledgement_replies_to_the_team_not_a_void(): void
+    {
+        Mail::fake();
+        $this->post(route('lead.store'), $this->payload());
+
+        Mail::assertSent(LeadAcknowledged::class,
+            fn ($m) => $m->hasReplyTo(config('site.email')));
+    }
+
+    public function test_the_acknowledgement_never_goes_to_the_team_addresses(): void
+    {
+        // Sending the visitor-facing acknowledgement to admin@/info@ would be noise that
+        // looks exactly like a second enquiry.
+        Mail::fake();
+        $this->post(route('lead.store'), $this->payload());
+
+        Mail::assertSent(LeadAcknowledged::class, function ($m) {
+            foreach (config('site.lead_recipients') as $team) {
+                if ($m->hasTo($team)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    public function test_both_emails_are_independent_of_each_other(): void
+    {
+        // Two sends, two guards. The team notification failing must not suppress the
+        // acknowledgement, and vice versa -- so both are attempted on every submission.
+        Mail::fake();
+        $this->post(route('lead.store'), $this->payload());
+
+        Mail::assertSent(LeadReceived::class);
+        Mail::assertSent(LeadAcknowledged::class);
     }
 }

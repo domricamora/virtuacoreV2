@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LeadRequest;
+use App\Mail\LeadAcknowledged;
 use App\Mail\LeadReceived;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -67,6 +68,16 @@ final class LeadController extends Controller
             Log::error('lead.notify failed: '.$e->getMessage(), [
                 'recipients' => $recipients,
                 'lead_at'    => $lead['at'] ?? null,
+            ]);
+        }
+
+        // Sent in its own try: the team being notified and the enquirer being
+        // acknowledged are independent, and one failing must not suppress the other.
+        try {
+            Mail::to($lead['email'])->send(new LeadAcknowledged($lead));
+        } catch (Throwable $e) {
+            Log::error('lead.acknowledge failed: '.$e->getMessage(), [
+                'lead_at' => $lead['at'] ?? null,
             ]);
         }
     }

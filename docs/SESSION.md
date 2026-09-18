@@ -1,68 +1,68 @@
-# Session state — 2026-09-18
+# Session state — 2026-09-19
 
-Where the port stands, what is deliberately unfinished, and what is blocked on someone else.
+**The site is live at https://www.virtuacore.net and working.**
 
 ## Done
 
-13 URLs live, all returning 200 with one `h1` and JSON-LD each. **86 tests, 727 assertions.**
+All 13 URLs return 200. **131 tests, 889 assertions.**
 
 | Layer | State |
 |---|---|
-| Laravel 13.32 scaffold, repo, CI workflow | done |
-| Design system (Tailwind v4, Geist, Phosphor sprite) | ported |
-| Content layer (8 sets, verified identical to source) | done |
-| Nav, footer, SEO head, JSON-LD | done |
-| All 11 page templates (13 URLs) | done |
-| Per-page hero videos + posters | done |
+| Laravel 13.32, design system, content layer | done |
+| 13 pages, nav, footer, SEO head, JSON-LD | done |
+| Per-page hero videos (7 clips) + posters | done |
 | sitemap.xml, robots.txt, llms.txt | generated from content |
 | Error pages 403/404/419/500 | done |
-| WordPress 301 map + 410s | done |
-| Lead form (validation, honeypot, rate limit, durable log) | done |
+| WordPress 301 map + 410s for infrastructure paths | done, verified live |
+| Lead form: validation, honeypot, rate limit, durable log | done |
+| Email to admin@ + info@, plus acknowledgement to enquirer | done |
+| Security headers, canonical host redirect | done, verified live |
+| Deployed to production over FTP | done |
 
 ## Not done
 
-- **Tracking** — blocked on the analytics decision. The privacy policy is generated from
-  `config('site.features.analytics')` (currently `false`) and a test fails if the policy
-  and the flag disagree, so turning tracking on requires updating both together.
-- **Lead dashboard** — would be the only thing needing a database. Pages render without one.
-- **Cutover** — see below.
+- **Tracking / analytics.** Still needs a decision: GA4, Plausible, or none. The privacy
+  policy is generated from `config('site.features.analytics')` (currently `false`) and a
+  test fails if the policy and the flag disagree, so both move together.
+- **Lead dashboard.** Would be the only thing needing a database. Enquiries are currently
+  read from `storage/logs/leads-*.log` and from email.
+- **Lighthouse audit.** Never run against production.
 
-## The deploy workflow is deliberately not armed
+## Needs the owner
 
-`.github/workflows/deploy.yml` is written and YAML-validated, but the `FTP_*` secrets are
-**not set**, so a push does not deploy. To arm it, set `FTP_SERVER`, `FTP_USERNAME`,
-`FTP_PASSWORD`, `FTP_APP_DIR`, `FTP_PUBLIC_DIR` via `gh secret set`.
+1. **Confirm mail actually arrives.** Delivery through the server's MTA is the one part
+   that cannot be verified from here. Submit the form once and check both addresses.
+2. **Rotate the FTP password.** It was shared in chat and this repo is public.
+3. **GitHub Actions is blocked by billing** — every run fails with "your account is locked
+   due to a billing issue". Not a code problem. Until it is resolved, deploys are manual
+   over FTP. The workflow itself is ready and its secrets are still unset.
+4. LinkedIn and X URLs (Facebook and Instagram are wired).
+5. Whether "mixed organic and seeded" on `/for-authors/social-media-kits` stays — it
+   advertises non-organic follower growth, which is against Meta's terms.
 
-The owner has since moved WordPress out of the web root into `/wp_old/`, so
-virtuacore.net now serves a host parking page. That removes the risk the caution was
-protecting against — there is no longer a live site at the root to break. Keep `/wp_old/`
-until the 301s are proven live, because the old image URLs are still indexed.
+## Traps this deployment already fell into
 
-## Known gap: author-page footage
+Recorded because each cost real time and none announced itself.
 
-`/for-authors/` and its six detail pages show the general laptop clip as a placeholder.
-They should show writing or manuscripts — the author line is a different audience from the
-staffing line, which is the whole argument of the page. Pexels' download pages sit behind a
-Cloudflare challenge and the CDN filenames are not derivable from a video ID, so no writing
-clip could be sourced automatically.
+- **The FTP account is not chrooted.** It lands in the home directory; the site is in
+  `public_html/`. This changed mid-session, and an entire debugging pass was applied to a
+  stray `/home/sodncqbe/vc_app/` while the live app sat elsewhere. **Check the path before
+  every upload.**
+- **FTPS silently truncates.** This server aborts data transfers with `451` *after* the
+  bytes are sent, leaving zero-byte files that listings report as present. Use
+  `curl --ftp-ssl-control`, and verify by **size**, never presence.
+- **Never deploy `bootstrap/cache/*.php`.** A `services.php` generated on a dev machine
+  makes Laravel ignore `.env` entirely — a 500 with no log and no usable error.
+- **`index.php` needs `usePublicPath(__DIR__)`.** Without it `public_path()` resolves to
+  `basePath/public`, which does not exist in the split layout, and Vite's manifest lookup
+  fails on every page.
+- **`expectsJson()` recognises only `XMLHttpRequest` or `Accept: application/json`.** The
+  form sent `X-Requested-With: 'fetch'`, got a 302 to HTML, and told every visitor their
+  connection had failed.
 
-**To fix:** drop a 1080p writing clip into `resources/source-media/video/` and it can be
-encoded and wired in one step. See `docs/media-credits.md`.
-
-## Blocked on the owner
-
-1. **SMTP credentials.** Leads are validated and written durably to their own log channel,
-   but nothing emails anyone. Until SMTP exists, `storage/logs/leads.log` is the inbox.
-2. **Analytics** — GA4, Plausible, or none.
-
-Non-blocking: LinkedIn and X URLs; and whether the "mixed organic and seeded" follower
-copy on `/for-authors/social-media-kits` stays — it advertises non-organic follower growth,
-which is against Meta's terms.
-
-## The rule that governs everything here
+## The rule that governs this codebase
 
 Nothing on this site claims something that is not true. Stats, testimonials and the logo
 wall stay behind flags that are off. Pricing publishes no rates. The schema emits no
-`AggregateRating` or `Review`. `/for-authors/` states plainly what it does not guarantee.
-Tests enforce each of these, because every one of them was a real defect on the site this
-replaces.
+`AggregateRating` or `Review`. `/for-authors/` states what it does not guarantee. Tests
+enforce each one, because every one was a real defect on the site this replaces.

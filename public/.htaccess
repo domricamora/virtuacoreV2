@@ -1,3 +1,49 @@
+# ---------------------------------------------------------------------------
+# Canonical host
+#
+# Every canonical, every og:url and the sitemap all name the www host. Serving the
+# same pages on the bare host as well splits ranking signals between two URLs for
+# identical content. Redirect rather than rely on the canonical tag alone: a tag is a
+# hint, a 301 is an instruction.
+#
+# Placed BEFORE the front-controller rules so it happens on the way in, not after
+# Laravel has already handled the request.
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{HTTP_HOST} !^www\. [NC]
+    RewriteCond %{HTTP_HOST} !^localhost [NC]
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
+    RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Security headers
+#
+# The host already handles compression (brotli) and long cache lifetimes on static
+# assets, so neither is repeated here. These headers were absent entirely.
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    # Stop browsers guessing a content type and running a file as something it is not.
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Send the origin to other sites, the full path only to ourselves. Keeps referrer
+    # data useful internally without leaking page paths to third parties.
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # No third party needs to frame this site, and clickjacking is the reason to care.
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # The site asks for none of these, so refuse them outright rather than leaving the
+    # decision to a future embedded script.
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+
+    # HSTS. Two years, subdomains included. NOT preloaded: preload is effectively
+    # irreversible and should be a deliberate decision, not a side effect of a deploy.
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

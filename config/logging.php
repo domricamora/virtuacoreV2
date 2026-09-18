@@ -52,6 +52,18 @@ return [
 
     'channels' => [
 
+        /**
+         * Leads are written here as JSON lines before any notification is attempted, so a
+         * mail failure can never lose one. Until SMTP exists, this file IS the inbox.
+         * Never rotated away aggressively: an unread lead is revenue.
+         */
+        'leads' => [
+            'driver' => 'daily',
+            'path'   => storage_path('logs/leads.log'),
+            'level'  => 'info',
+            'days'   => 365,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', (string) env('LOG_STACK', 'single')),

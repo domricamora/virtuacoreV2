@@ -1,5 +1,4 @@
 <x-layout :title="$heading">
-  <x-site.nav />
   <main id="main">
     <section class="vc-section">
       <div class="vc-wrap vc-wrap--wide">

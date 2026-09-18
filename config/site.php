@@ -29,9 +29,21 @@ return [
         'country'  => 'US',
     ],
 
-    // TODO(owner): confirm the time zone. The old site said "Mon - Sat: 8.00 - 18.00"
-    // without one, which is ambiguous for a remote-staffing company selling coverage.
-    'hours' => ['days' => 'Mon – Sat', 'open' => '08:00', 'close' => '18:00', 'tz' => null],
+    /**
+     * The WordPress site said "Mon - Sat: 8.00 - 18.00" with no zone, which is ambiguous
+     * for a company selling coverage hours. The source build resolved it to MT, which
+     * matches the Sheridan, Wyoming address. Stated explicitly on the page: a prospect in
+     * another zone cannot act on an unqualified time.
+     */
+    'hours' => [
+        'days'  => 'Mon to Sat',
+        'open'  => '8:00',
+        'close' => '18:00',
+        'tz'    => 'MT',
+        'iana'  => 'America/Denver',
+        // schema.org openingHours format
+        'spec'  => 'Mo-Sa 08:00-18:00',
+    ],
 
     // Only URLs that actually resolve belong here. The WordPress footer pointed every
     // social icon at "#", which is worse than omitting them.
